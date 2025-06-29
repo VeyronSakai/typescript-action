@@ -6,13 +6,20 @@
 [![CodeQL](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml)
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
 
-Use this template to bootstrap the creation of a TypeScript action. :rocket:
+Use this template to bootstrap the creation of a TypeScript action with
+production-ready patterns. :rocket:
 
-This template includes compilation support, tests, a validation workflow,
-publishing, and versioning guidance.
+This template includes:
 
-If you are new, there's also a simpler introduction in the
-[Hello world JavaScript action repository](https://github.com/actions/hello-world-javascript-action).
+- **GitHub API integration** with @actions/github
+- **Comprehensive error handling** and input validation
+- **Production-ready testing** with realistic scenarios
+- **Cross-platform CI/CD** workflows
+- **TypeScript best practices** and modern development patterns
+
+Inspired by real-world actions like
+[conflict-marker-checker](https://github.com/VeyronSakai/conflict-marker-checker),
+this template demonstrates professional GitHub Action development.
 
 ## Create Your Own Action
 
@@ -179,59 +186,127 @@ For information about versioning your action, see
 [Versioning](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
 in the GitHub Actions toolkit.
 
-## Validate the Action
+## Usage Examples
 
-You can now validate the action by referencing it in a workflow file. For
-example, [`ci.yml`](./.github/workflows/ci.yml) demonstrates how to reference an
-action in the same repository.
+### Basic Usage
+
+The template action demonstrates GitHub API integration and proper error
+handling:
 
 ```yaml
 steps:
   - name: Checkout
-    id: checkout
     uses: actions/checkout@v4
 
-  - name: Test Local Action
-    id: test-action
+  - name: Run TypeScript Action
+    id: typescript-action
     uses: ./
     with:
-      milliseconds: 1000
+      token: ${{ secrets.GITHUB_TOKEN }}
+      milliseconds: '2000'
+      example-input: 'my-custom-value'
 
-  - name: Print Output
-    id: output
-    run: echo "${{ steps.test-action.outputs.time }}"
+  - name: Use Action Outputs
+    run: |
+      echo "Processing completed at: ${{ steps.typescript-action.outputs.time }}"
+      echo "Result: ${{ steps.typescript-action.outputs.result }}"
+      echo "Successfully processed: ${{ steps.typescript-action.outputs.processed }}"
 ```
 
-For example workflow runs, check out the
-[Actions tab](https://github.com/actions/typescript-action/actions)! :rocket:
+### Real-World Integration Example
 
-## Usage
-
-After testing, you can create version tag(s) that developers can use to
-reference different stable versions of your action. For more information, see
-[Versioning](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-in the GitHub Actions toolkit.
-
-To include the action in a workflow in another repository, you can use the
-`uses` syntax with the `@` symbol to reference a specific branch, tag, or commit
-hash.
+Here's how you might use this action in a real workflow:
 
 ```yaml
-steps:
-  - name: Checkout
-    id: checkout
-    uses: actions/checkout@v4
+name: Process Repository Data
+on:
+  pull_request:
+    types: [opened, synchronize]
 
-  - name: Test Local Action
-    id: test-action
-    uses: actions/typescript-action@v1 # Commit with the `v1` tag
-    with:
-      milliseconds: 1000
+jobs:
+  process-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  - name: Print Output
-    id: output
-    run: echo "${{ steps.test-action.outputs.time }}"
+      - name: Process Repository Information
+        id: process
+        uses: your-org/typescript-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          milliseconds: '1500'
+          example-input: ${{ github.event.pull_request.title }}
+
+      - name: Comment on PR
+        if: steps.process.outputs.processed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Processing completed: ${{ steps.process.outputs.result }}'
+            })
 ```
+
+### Local Development and Testing
+
+The action includes comprehensive local testing capabilities:
+
+1. **Environment Setup**: Create a `.env` file for local testing:
+
+   ```bash
+   # .env
+   INPUT_TOKEN=your-github-token
+   INPUT_MILLISECONDS=1000
+   INPUT_EXAMPLE-INPUT=test-value
+   GITHUB_REPOSITORY=owner/repo
+   ```
+
+2. **Local Testing**: Use the included local-action utility:
+
+   ```bash
+   npm run local-action
+   ```
+
+3. **Debug Mode**: Enable step debugging in your workflows:
+   ```yaml
+   env:
+     ACTIONS_STEP_DEBUG: true
+   ```
+
+### Error Handling Examples
+
+The template demonstrates comprehensive error handling patterns:
+
+**Input Validation Errors:**
+
+- Missing required `token` input
+- Invalid `milliseconds` value (non-numeric or negative)
+
+**GitHub API Errors:**
+
+- Rate limit handling with appropriate warnings
+- Repository access permission errors
+- Network connectivity issues
+
+**Example Error Response:**
+
+```
+Error: Invalid milliseconds value: not-a-number. Must be a non-negative number.
+```
+
+### Cross-Platform Support
+
+The action is tested on multiple platforms:
+
+- Ubuntu (Linux)
+- Windows
+- macOS
+
+CI/CD workflows include cross-platform testing to ensure compatibility.
 
 ## Publishing a New Release
 

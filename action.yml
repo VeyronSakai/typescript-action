@@ -1,23 +1,36 @@
-name: The name of your action here
-description: Provide a description here
-author: Your name or organization here
+name: 'TypeScript Action Template'
+description:
+  'A comprehensive TypeScript Action template with GitHub API integration, error
+  handling, and testing examples'
+author: 'GitHub Actions Community'
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: heart
-  color: red
+  icon: 'code'
+  color: 'blue'
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: Your input description here
+  token:
+    description: 'GitHub token for API access (typically secrets.GITHUB_TOKEN)'
     required: true
+  milliseconds:
+    description: 'Time to wait in milliseconds before processing'
+    required: false
     default: '1000'
+  example-input:
+    description: 'Example input parameter to demonstrate input handling'
+    required: false
+    default: 'default'
 
 # Define your outputs here.
 outputs:
   time:
-    description: Your output description here
+    description: 'The time when the action completed processing'
+  result:
+    description: 'The result of the processing operation'
+  processed:
+    description: 'Boolean indicating whether processing was successful'
 
 runs:
   using: node20
