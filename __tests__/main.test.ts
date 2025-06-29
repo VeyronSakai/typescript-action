@@ -10,6 +10,21 @@ import * as core from '../__fixtures__/core.js'
 import * as github from '../__fixtures__/github.js'
 import { wait } from '../__fixtures__/wait.js'
 
+// Types for mock functions
+interface MockGitHubGet {
+  (): Promise<{
+    data: { full_name: string; name: string; owner: { login: string } }
+  }>
+}
+
+interface MockOctokit {
+  rest: {
+    repos: {
+      get: jest.MockedFunction<MockGitHubGet>
+    }
+  }
+}
+
 // Mocks should be declared before the module being tested is imported.
 jest.unstable_mockModule('@actions/core', () => core)
 jest.unstable_mockModule('@actions/github', () => github)
@@ -41,8 +56,8 @@ describe('main.ts', () => {
     // Mock the wait function so that it does not actually wait.
     wait.mockImplementation(() => Promise.resolve('done!'))
 
-    // Mock GitHub API responses using any to bypass type checking
-    const mockGet = jest.fn() as jest.MockedFunction<any>
+    // Mock GitHub API responses with proper typing
+    const mockGet = jest.fn<MockGitHubGet>()
     mockGet.mockResolvedValue({
       data: {
         full_name: 'owner/repo',
@@ -51,13 +66,14 @@ describe('main.ts', () => {
       }
     })
 
-    github.getOctokit.mockReturnValue({
+    const mockOctokit: MockOctokit = {
       rest: {
         repos: {
           get: mockGet
         }
       }
-    } as any)
+    }
+    github.getOctokit.mockReturnValue(mockOctokit)
 
     // Mock GitHub context is set in the fixture file
   })
@@ -169,16 +185,17 @@ describe('main.ts', () => {
 
   describe('GitHub API error handling', () => {
     it('handles rate limit errors gracefully', async () => {
-      const mockGet = jest.fn() as jest.MockedFunction<any>
+      const mockGet = jest.fn<MockGitHubGet>()
       mockGet.mockRejectedValue(new Error('API rate limit exceeded'))
 
-      github.getOctokit.mockReturnValue({
+      const mockOctokit: MockOctokit = {
         rest: {
           repos: {
             get: mockGet
           }
         }
-      } as any)
+      }
+      github.getOctokit.mockReturnValue(mockOctokit)
 
       await run()
 
@@ -191,16 +208,17 @@ describe('main.ts', () => {
     })
 
     it('handles repository not found errors', async () => {
-      const mockGet = jest.fn() as jest.MockedFunction<any>
+      const mockGet = jest.fn<MockGitHubGet>()
       mockGet.mockRejectedValue(new Error('Not Found'))
 
-      github.getOctokit.mockReturnValue({
+      const mockOctokit: MockOctokit = {
         rest: {
           repos: {
             get: mockGet
           }
         }
-      } as any)
+      }
+      github.getOctokit.mockReturnValue(mockOctokit)
 
       await run()
 
