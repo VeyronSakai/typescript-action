@@ -17,14 +17,14 @@ jobs:
     #   github.event.pull_request.user.login == 'external-contributor' ||
     #   github.event.pull_request.user.login == 'new-developer' ||
     #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
-    
+
     runs-on: ubuntu-latest
     permissions: # checkov:skip=CKV2_GHA_1 id-token write permission is required for OIDC authentication with Claude
       contents: read
       pull-requests: write # Changed from read - Claude needs write to post review comments
       issues: write # Changed from read - Claude needs write to post comments
       id-token: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -37,7 +37,6 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
-          
           # Direct prompt for automated review (no @claude mention needed)
           direct_prompt: |
             Please review this pull request and provide feedback on:
@@ -46,11 +45,11 @@ jobs:
             - Performance considerations
             - Security concerns
             - Test coverage
-            
+
             Be constructive and helpful in your feedback.
 
           use_sticky_comment: true
-          
+
           # Optional: Customize review based on file types
           # direct_prompt: |
           #   Review this PR focusing on:
@@ -58,18 +57,17 @@ jobs:
           #   - For API endpoints: Security, input validation, and error handling
           #   - For React components: Performance, accessibility, and best practices
           #   - For tests: Coverage, edge cases, and test quality
-          
+
           # Optional: Different prompts for different authors
           # direct_prompt: |
-          #   ${{ github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR' && 
+          #   ${{ github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR' &&
           #   'Welcome! Please review this PR from a first-time contributor. Be encouraging and provide detailed explanations for any suggestions.' ||
           #   'Please provide a thorough code review focusing on our coding standards and best practices.' }}
-          
-          allowed_tools:
-            'Bash(npm run test),Bash(npm run lint),Bash(npm run typecheck)'
-          
+
+          allowed_tools: |
+            "Bash(npm run test),Bash(npm run lint),Bash(npm run typecheck)"
+
           # Optional: Skip review for certain conditions
           # if: |
           #   !contains(github.event.pull_request.title, '[skip-review]') &&
           #   !contains(github.event.pull_request.title, '[WIP]')
-
