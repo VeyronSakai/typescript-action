@@ -19,10 +19,10 @@ jobs:
     #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
     
     runs-on: ubuntu-latest
-    permissions:
+    permissions: # checkov:skip=CKV2_GHA_1 id-token write permission is required for OIDC authentication with Claude
       contents: read
-      pull-requests: read
-      issues: read
+      pull-requests: write # Changed from read - Claude needs write to post review comments
+      issues: write # Changed from read - Claude needs write to post comments
       id-token: write
     
     steps:
@@ -33,12 +33,10 @@ jobs:
 
       - name: Run Claude Code Review
         id: claude-review
-        uses: anthropics/claude-code-action@beta
+        uses: anthropics/claude-code-action@cefe963a6b4ae0e511c59b9d6cb6b7b5923714a1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
-          # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4)
-          # model: "claude-opus-4-20250514"
           
           # Direct prompt for automated review (no @claude mention needed)
           direct_prompt: |
@@ -51,8 +49,7 @@ jobs:
             
             Be constructive and helpful in your feedback.
 
-          # Optional: Use sticky comments to make Claude reuse the same comment on subsequent pushes to the same PR
-          # use_sticky_comment: true
+          use_sticky_comment: true
           
           # Optional: Customize review based on file types
           # direct_prompt: |
@@ -68,8 +65,8 @@ jobs:
           #   'Welcome! Please review this PR from a first-time contributor. Be encouraging and provide detailed explanations for any suggestions.' ||
           #   'Please provide a thorough code review focusing on our coding standards and best practices.' }}
           
-          # Optional: Add specific tools for running tests or linting
-          # allowed_tools: "Bash(npm run test),Bash(npm run lint),Bash(npm run typecheck)"
+          allowed_tools:
+            'Bash(npm run test),Bash(npm run lint),Bash(npm run typecheck)'
           
           # Optional: Skip review for certain conditions
           # if: |
