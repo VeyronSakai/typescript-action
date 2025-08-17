@@ -13,13 +13,13 @@ on:
 jobs:
   claude:
     if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && !endsWith(github.event.comment.user.login, '[bot]')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude') && !endsWith(github.event.comment.user.login, '[bot]')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude') && !endsWith(github.event.review.user.login, '[bot]')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')) && !endsWith(github.event.issue.user.login, '[bot]'))
     runs-on: ubuntu-latest
     permissions: # checkov:skip=CKV2_GHA_1 id-token write permission is required for OIDC authentication with Claude
-      contents: read
+      contents: write # Changed from read - Claude needs write to create PRs
       pull-requests: write # Changed from read - Claude needs write to post comments
       issues: write # Changed from read - Claude needs write to post comments
       id-token: write
@@ -38,7 +38,8 @@ jobs:
           # This is an optional setting that allows Claude to read CI results on PRs
           additional_permissions: |
             actions: read
-          model: 'claude-opus-4-20250514'
+            contents: write
+          model: 'claude-opus-4.1-20250805'
           # Optional: Customize the trigger phrase (default: @claude)
           # trigger_phrase: "/claude"
 
