@@ -24,7 +24,7 @@ jobs:
 
     runs-on: ubuntu-latest
     permissions: # checkov:skip=CKV2_GHA_1 id-token write permission is required for OIDC authentication with Claude
-      contents: write # Changed from read - Claude needs write to create PRs
+      contents: read
       pull-requests: write # Changed from read - Claude needs write to post review comments
       issues: write # Changed from read - Claude needs write to post comments
       id-token: write
