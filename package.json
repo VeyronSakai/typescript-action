@@ -2,7 +2,7 @@
   "name": "typescript-action",
   "description": "GitHub Actions TypeScript template",
   "version": "0.1.0",
-  "author": "",
+  "author": "Yuki Sakai",
   "type": "module",
   "private": true,
   "homepage": "https://github.com/actions/typescript-action",
