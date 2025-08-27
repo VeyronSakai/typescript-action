@@ -8,10 +8,6 @@ on:
       - closed
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
-
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PACKAGE_JSON_PATH: package.json
@@ -81,6 +77,9 @@ jobs:
       github.event.pull_request.base.ref == 'main') || github.event_name ==
       'workflow_dispatch' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
@@ -97,6 +96,9 @@ jobs:
     needs: update-draft
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: true
@@ -158,6 +160,8 @@ jobs:
     needs: [update-draft, paths-filter, check-version]
     environment: Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: false
