@@ -23,7 +23,8 @@ jobs:
     name: Paths Filter
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
-    permissions: {}
+    permissions:
+      pull-requests: read
     outputs:
       package_json: ${{ steps.filter.outputs.package_json }}
     steps:
