@@ -12,8 +12,8 @@ on:
 
 jobs:
   claude-review:
-    # Exclude Dependabot PRs to avoid OIDC authentication errors
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    # Exclude bot PRs to avoid OIDC authentication errors
+    if: ${{ !endsWith(github.actor, '[bot]') }}
 
     # Optional: Filter by PR author
     # if: |
