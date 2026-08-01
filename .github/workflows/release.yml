@@ -28,7 +28,7 @@ jobs:
     outputs:
       package_json: ${{ steps.filter.outputs.package_json }}
     steps:
-      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d
+      - uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706
         id: filter
         with:
           filters: |
@@ -90,7 +90,7 @@ jobs:
     outputs:
       tag_name: ${{ steps.release-drafter.outputs.tag_name }}
     steps:
-      - uses: release-drafter/release-drafter@ed4bc48ec97379be2258e7b7ac2624a3e26ab809
+      - uses: release-drafter/release-drafter@eada3c96a64734dd381cfbda23511034e328ddb0
         id: release-drafter
         with:
           commitish: main
@@ -111,7 +111,7 @@ jobs:
       VERSION: ${{ needs.update-draft.outputs.tag_name }}
       SOURCE_BRANCH: github-actions/update-files/${{ github.run_number }}
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: true
       - name: Update package.json
@@ -181,7 +181,7 @@ jobs:
     env:
       VERSION: ${{ needs.update-draft.outputs.tag_name }}
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
           persist-credentials: true
@@ -198,7 +198,7 @@ jobs:
             Write-Error "version in package.json ($packageVersion) does not match the release draft tag ($expectedVersion from $env:VERSION)"
             exit 1
           }
-      - uses: release-drafter/release-drafter@ed4bc48ec97379be2258e7b7ac2624a3e26ab809
+      - uses: release-drafter/release-drafter@eada3c96a64734dd381cfbda23511034e328ddb0
         id: release-drafter
         with:
           publish: true
@@ -218,7 +218,7 @@ jobs:
             Write-Error "Unable to parse version: $env:VERSION"
             exit 1
           }
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ env.VERSION }}
           persist-credentials: true
